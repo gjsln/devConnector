@@ -28,7 +28,10 @@ router.get('/test', (req, res) => res.json({
 // @access Public 
 
 router.post('/register', (req, res) => {
-    const { errors, isValid } = validateRegisterInput(req.body);
+    const {
+        errors,
+        isValid
+    } = validateRegisterInput(req.body);
     // Check Validation
     if (!isValid) {
         return res.status(400).json(errors);
@@ -118,7 +121,7 @@ router.post('/login', (req, res) => {
                             (err, token) => {
                                 res.json({
                                     success: true,
-                                    token: 'Bearer' + token
+                                    token: 'Bearer ' + token
                                 })
                             });
                     } else {
