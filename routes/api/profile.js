@@ -3,6 +3,10 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const passport = require('passport');
 
+// Load validation
+
+const validationProfileInput = require('../../validation/profile')
+
 //Load profile models
 
 const Profile = require('../../models/Profile');
@@ -23,18 +27,20 @@ router.get('/test', (req, res) => res.json({
 
 router.get('/', passport.authenticate('jwt', {
     session: false
-}), (res, req) => {
+}), (req, res) => {
     const errors = {};
+
     Profile.findOne({
-        user: req.user.id
-    }).then(profile => {
-        console.log('get request >>>> ', profile);
-        if (!profile) {
-            errors.noprofile = 'There is no profile for this user';
-            return res.statusCode(404).json();
-        }
-        res.json(profile);
-    }).catch(err => res.statusCode(404).json(err));
+            user: req.user.id
+        })
+        .populate('user', ['name', 'avatar'])
+        .then(profile => {
+            if (!profile) {
+                errors.noprofile = 'There is no profile for this user';
+                return res.status(404).json();
+            }
+            res.json(profile);
+        }).catch(err => res.status(404).json(err));
 });
 
 // @route POST api/profile
@@ -43,9 +49,16 @@ router.get('/', passport.authenticate('jwt', {
 
 router.post('/', passport.authenticate('jwt', {
     session: false
-}), (res, req) => {
-    const errors = {};
+}), (req, res) => {
+    const {
+        errors,
+        isValid
+    } = validationProfileInput(req.body);
 
+    if (!isValid) {
+        // Return any errors with 400 status
+        return res.status(400).json(errors);
+    }
     // Get fields
     const profileFields = {};
     profileFields.user = req.user.id;
@@ -90,7 +103,7 @@ router.post('/', passport.authenticate('jwt', {
                 handle: profileFields.handler
             }).then(profile => {
                 if (profile) {
-                    errors.handle = 'that handle already exists';
+                    errors.handle = 'That handle already exists';
                     res.status(400).json(errors);
                 }
 
