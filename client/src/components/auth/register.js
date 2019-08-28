@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
-import axios from 'axios';
+// import axios from 'axios';
 import classnames from 'classnames';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { registerUser } from './../../actions/authActions';
 
 class Register extends Component {
   constructor() {
@@ -16,6 +19,12 @@ class Register extends Component {
     this.onSubmit = this.onSubmit.bind(this);
   }
 
+  static getDerivedStateFromProps(props, state) {
+    return {
+      errors: props.errors
+    };
+  }
+
   onSubmit(e) {
     e.preventDefault();
 
@@ -26,12 +35,7 @@ class Register extends Component {
       password2: this.state.password2
     };
 
-    axios
-      .post('/api/userAuth/register', newUser)
-      .then(res => console.log(res.data))
-      .catch(err => this.setState({ errors: err.response.data }));
-
-    console.log(newUser);
+    this.props.registerUser(newUser);
   }
 
   onChange(e) {
@@ -65,7 +69,7 @@ class Register extends Component {
                     required
                   />
                   {errors.name && (
-                    <div className='invalid-feedback'>{errors.name}</div>
+                    <div className='invalid-feedback'> {errors.name} </div>
                   )}
                 </div>
                 <div className='form-group'>
@@ -80,7 +84,7 @@ class Register extends Component {
                     name='email'
                   />
                   {errors.email && (
-                    <div className='invalid-feedback'>{errors.email}</div>
+                    <div className='invalid-feedback'> {errors.email} </div>
                   )}
                   <small className='form-text text-muted'>
                     This site uses Gravatar so if you want a profile image, use
@@ -99,7 +103,7 @@ class Register extends Component {
                     name='password'
                   />
                   {errors.password && (
-                    <div className='invalid-feedback'>{errors.password}</div>
+                    <div className='invalid-feedback'> {errors.password} </div>
                   )}
                 </div>
                 <div className='form-group'>
@@ -114,7 +118,7 @@ class Register extends Component {
                     name='password2'
                   />
                   {errors.password2 && (
-                    <div className='invalid-feedback'>{errors.password2}</div>
+                    <div className='invalid-feedback'> {errors.password2} </div>
                   )}
                 </div>
                 <input type='submit' className='btn btn-info btn-block mt-4' />
@@ -127,4 +131,20 @@ class Register extends Component {
   }
 }
 
-export default Register;
+const mapStateToProps = state => ({
+  auth: state.auth,
+  errors: state.errors
+});
+
+Register.propTypes = {
+  registerUser: PropTypes.func.isRequired,
+  auth: PropTypes.object.isRequired,
+  errors: PropTypes.object.isRequired
+};
+
+export default connect(
+  mapStateToProps,
+  {
+    registerUser
+  }
+)(Register);
