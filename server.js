@@ -15,7 +15,9 @@ const db = require('./config/dbConfig').mongoURI;
 // Connect to mongoDB 
 
 mongoose
-    .connect(db)
+    .connect(db, {
+        useNewUrlParser: true
+    })
     .then(() => console.log('MongoDB Connected Successfully'))
     .catch(err => console.log(err));
 

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 // import axios from 'axios';
 import classnames from 'classnames';
+import { withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { registerUser } from './../../actions/authActions';
@@ -35,7 +36,7 @@ class Register extends Component {
       password2: this.state.password2
     };
 
-    this.props.registerUser(newUser);
+    this.props.registerUser(newUser, this.props.history);
   }
 
   onChange(e) {
@@ -147,4 +148,4 @@ export default connect(
   {
     registerUser
   }
-)(Register);
+)(withRouter(Register));

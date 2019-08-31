@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
 import classnames from 'classnames';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { loginUser } from './../../actions/authActions';
 
 class Login extends Component {
   constructor() {
@@ -15,30 +18,52 @@ class Login extends Component {
   }
 
   onChange(e) {
-    this.setState({ [e.target.name]: e.target.value });
+    this.setState({
+      [e.target.name]: e.target.value
+    });
+  }
+
+  componentDidMount() {
+    if (this.props.auth.isAuthenticated) {
+      this.props.history.push('/dashboard');
+    }
+  }
+
+  static getDerivedStateFromProps(nextProps) {
+    if (nextProps.auth.isAuthenticated) {
+      nextProps.history.push('/dashboard');
+      return {};
+    }
+
+    if (nextProps.errors) {
+      return {
+        errors: nextProps.errors
+      };
+    }
   }
 
   onSubmit(e) {
     e.preventDefault();
 
-    const loginUser = {
+    const userData = {
       email: this.state.email,
       password: this.state.password
     };
 
-    console.log(loginUser);
+    this.props.loginUser(userData);
   }
   render() {
     const { errors } = this.state;
+
     return (
       <div className='login'>
         <div className='container'>
           <div className='row'>
             <div className='col-md-8 m-auto'>
-              <h1 className='display-4 text-center'>Log In</h1>
+              <h1 className='display-4 text-center'> Log In </h1>{' '}
               <p className='lead text-center'>
-                Sign in to your DevConnector account
-              </p>
+                Sign in to your DevConnector account{' '}
+              </p>{' '}
               <form noValidate onSubmit={this.onSubmit}>
                 <div className='form-group'>
                   <input
@@ -52,9 +77,9 @@ class Login extends Component {
                     name='email'
                   />
                   {errors.email && (
-                    <div className='invalid-feedback'>{errors.email}</div>
-                  )}
-                </div>
+                    <div className='invalid-feedback'> {errors.email} </div>
+                  )}{' '}
+                </div>{' '}
                 <div className='form-group'>
                   <input
                     type='password'
@@ -67,17 +92,35 @@ class Login extends Component {
                     name='password'
                   />
                   {errors.password && (
-                    <div className='invalid-feedback'>{errors.password}</div>
-                  )}
-                </div>
+                    <div className='invalid-feedback'> {errors.password} </div>
+                  )}{' '}
+                </div>{' '}
                 <input type='submit' className='btn btn-info btn-block mt-4' />
-              </form>
-            </div>
-          </div>
-        </div>
+              </form>{' '}
+            </div>{' '}
+          </div>{' '}
+        </div>{' '}
       </div>
     );
   }
 }
 
-export default Login;
+const mapStateToProps = state => {
+  return {
+    auth: state.auth,
+    errors: state.errors
+  };
+};
+
+Login.propTypes = {
+  loginUser: PropTypes.func.isRequired,
+  auth: PropTypes.object.isRequired,
+  errors: PropTypes.object.isRequired
+};
+
+export default connect(
+  mapStateToProps,
+  {
+    loginUser
+  }
+)(Login);
