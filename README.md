@@ -1,5 +1,16 @@
 # devConnector
 
+# Run Server
+
+npm run server
+
+# Run Dev Environment
+
+npm run dev
+
+# Run Client
+
+npm run client
 
 https://stackblitz.com/edit/angular-p12rek
 
